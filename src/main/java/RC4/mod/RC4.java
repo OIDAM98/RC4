@@ -4,28 +4,34 @@ public class RC4 {
     private final byte[] S = new byte[256];
     private final byte[] T = new byte[256];
     private final int keylen;
+    private final byte[] key;
+
+    private void KSA() {
+        for (int i = 0; i < 256; i++) {
+            S[i] = (byte) i;
+            T[i] = key[i % keylen];
+        }
+        int j = 0;
+        byte tmp;
+        for (int i = 0; i < 256; i++) {
+            j = (j + S[i] + T[i]) & 0xFF;
+            tmp = S[j];
+            S[j] = S[i];
+            S[i] = tmp;
+        }
+    }
 
     public RC4(final byte[] key) {
         if (key.length < 1 || key.length > 256) {
             throw new IllegalArgumentException("key must be between 1 and 256 bytes");
         } else {
             keylen = key.length;
-            for (int i = 0; i < 256; i++) {
-                S[i] = (byte) i;
-                T[i] = key[i % keylen];
-            }
-            int j = 0;
-            byte tmp;
-            for (int i = 0; i < 256; i++) {
-                j = (j + S[i] + T[i]) & 0xFF;
-                tmp = S[j];
-                S[j] = S[i];
-                S[i] = tmp;
-            }
+            this.key = key;
         }
     }
 
     public byte[] encrypt(final byte[] plaintext) {
+        KSA();
         final byte[] ciphertext = new byte[plaintext.length];
         int i = 0, j = 0, k, t;
         byte tmp;
