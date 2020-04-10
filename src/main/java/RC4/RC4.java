@@ -1,12 +1,12 @@
-package RC4.mod;
+package RC4;
 
 public class RC4 {
     private final byte[] S = new byte[256];
     private final byte[] T = new byte[256];
-    private final int keylen;
     private final byte[] key;
 
     private void KSA() {
+        int keylen = key.length;
         for (int i = 0; i < 256; i++) {
             S[i] = (byte) i;
             T[i] = key[i % keylen];
@@ -25,7 +25,6 @@ public class RC4 {
         if (key.length < 1 || key.length > 256) {
             throw new IllegalArgumentException("key must be between 1 and 256 bytes");
         } else {
-            keylen = key.length;
             this.key = key;
         }
     }
