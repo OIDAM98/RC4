@@ -2,8 +2,9 @@ package RC4.mod;
 
 public class RC4Mod {
     private final int N = 256;
-    private final byte[] S1 = new byte[N];
-    private final byte[] S2 = new byte[N];
+    private final int half = N / 2;
+    private final byte[] S1 = new byte[half];
+    private final byte[] S2 = new byte[half];
     private final byte[] k1;
     private final byte[] k2;
 
@@ -14,7 +15,36 @@ public class RC4Mod {
     }
 
     private void KSA() {
-        // TO-DO
+        // Initializing both states
+        for (int i = 0; i < half - 1; i++) {
+            S1[i] = i;
+        }
+        for (int i = half; i < N - 1; i++) {
+            S1[i - half] = i;
+        }
+
+        // Paper of Diana
+        int j = 0;
+        for (int i = 0; i < half - 1; i++) {
+            j = (j + S1[i + k1[i % k1.length] % half] + k1[i % k1.length]) % half;
+            swap(S1, i, j);
+            j = 0;
+        }
+        for (int i = 0; i < half - 1; i++) {
+            j = j + S2[i] + k2[i % k2.length] % half;
+            swap(S2, i, j);
+        }
+
+        // Papaer of Alarcon
+        j = 0;
+        for (int i = 0; i < half - 1; i++) {
+            j = j + S1[i] + k1[i % k1.length] % half;
+            swap(S1, i, j);
+
+            j = j + S2[i] + k2[i % k2.length] % half;
+            swap(S2, i, j);
+        }
+
     }
 
     public RC4Mod(final byte[] key1, final byte[] key2) {
