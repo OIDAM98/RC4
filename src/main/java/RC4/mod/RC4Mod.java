@@ -20,22 +20,9 @@ public class RC4Mod {
             S1[i] = i;
         }
         for (int i = half; i < N - 1; i++) {
-            S1[i - half] = i;
+            S2[i - half] = i;
         }
 
-        // Paper of Diana
-        int j = 0;
-        for (int i = 0; i < half - 1; i++) {
-            j = (j + S1[i + k1[i % k1.length] % half] + k1[i % k1.length]) % half;
-            swap(S1, i, j);
-            j = 0;
-        }
-        for (int i = 0; i < half - 1; i++) {
-            j = j + S2[i] + k2[i % k2.length] % half;
-            swap(S2, i, j);
-        }
-
-        // Papaer of Alarcon
         j = 0;
         for (int i = 0; i < half - 1; i++) {
             j = j + S1[i] + k1[i % k1.length] % half;
