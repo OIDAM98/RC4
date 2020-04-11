@@ -14,6 +14,12 @@ public class RC4Mod {
         arr[i] = temp;
     }
 
+    private void swap(byte[] a, byte[] b, int i, int j) {
+        byte temp = b[j];
+        b[j] = a[i];
+        a[i] = temp;
+    }
+
     private void KSA() {
         // Initializing both states
         for (int i = 0; i < half - 1; i++) {
@@ -46,12 +52,29 @@ public class RC4Mod {
     public byte[] encrypt(final byte[] plaintext) {
         KSA();
         final byte[] ciphertext = new byte[plaintext.length];
-        int i = 0, j1 = 0, j2 = 0;
-        byte t1 = 0, t2 = 0;
+        int i = 0, j1 = 0, j2 = 0, t1, t2;
+        byte temp;
         for (int counter = 0; counter < plaintext.length; counter += 2) {
-            // TO-DO
+            i = (i + 1) & 0x7F;
+            j1 = (j1 + S1[i]) & 0x7F;
+
+            // Swap S1[i] with S2[j1]
+            swap(S1, S2, i, j1);
+
+            t1 = S1[(S1[i] + S1[j1]) & 0x7F];
+            j2 = (j2 + S2[i]) & 0x7F;
+
+            // Swap S2[i] with S1[j2]
+            swap(S2, S1, i, j2);
+
+            t2 = S2[(S2[i] + S2[j2]) & 0x7F];
+
+            // Swap S1[t1] with S2[t2]
+            swap(S1, S2, t1, t2);
+
+            // XOR with plaintext and add to ciphertext
             ciphertext[counter] = (byte) (plaintext[counter] ^ t1);
-            ciphertext[counter] = (byte) (plaintext[counter + 1] ^ t2);
+            ciphertext[counter + 1] = (byte) (plaintext[counter + 1] ^ t2);
 
         }
         return ciphertext;
