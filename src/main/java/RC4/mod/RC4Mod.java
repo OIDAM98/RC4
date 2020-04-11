@@ -23,7 +23,7 @@ public class RC4Mod {
             S2[i - half] = i;
         }
 
-        j = 0;
+        int j = 0;
         for (int i = 0; i < half - 1; i++) {
             j = j + S1[i] + k1[i % k1.length] % half;
             swap(S1, i, j);
