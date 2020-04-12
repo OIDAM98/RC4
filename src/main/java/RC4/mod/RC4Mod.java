@@ -24,7 +24,6 @@ public class RC4Mod {
         // Initializing both states
         for (int i = 0; i < half - 1; i++) {
             S1[i] = i;
-            // S2[i] = (byte) i;
         }
 
         for (int i = half; i < N - 1; i++) {
