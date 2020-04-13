@@ -1,5 +1,7 @@
 package RC4.mod;
 
+import org.apache.commons.lang3.time.StopWatch;
+
 public class RC4Mod {
     private final int N = 256;
     private final int half = N / 2;
@@ -81,4 +83,17 @@ public class RC4Mod {
     public byte[] decrypt(final byte[] ciphertext) {
         return encrypt(ciphertext);
     }
+
+    public long timedEncryption(final byte[] plaintext) {
+        StopWatch watch = new StopWatch();
+        watch.start();
+        encrypt(plaintext);
+        watch.stop();
+        return watch.getNanoTime();
+    }
+
+    public long timedDecryption(final byte[] ciphertext) {
+        return timedEncryption(ciphertext);
+    }
+
 }

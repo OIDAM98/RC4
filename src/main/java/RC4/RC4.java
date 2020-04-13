@@ -1,5 +1,8 @@
 package RC4;
 
+import org.apache.commons.lang3.time.StopWatch;
+
+
 public class RC4 {
     private final byte[] S = new byte[256];
     private final byte[] T = new byte[256];
@@ -49,5 +52,17 @@ public class RC4 {
 
     public byte[] decrypt(final byte[] ciphertext) {
         return encrypt(ciphertext);
+    }
+
+    public long timedEncryption(final byte[] plaintext) {
+        StopWatch watch = new StopWatch();
+        watch.start();
+        encrypt(plaintext);
+        watch.stop();
+        return watch.getNanoTime();
+    }
+
+    public long timedDecryption(final byte[] ciphertext) {
+        return timedEncryption(ciphertext);
     }
 }
