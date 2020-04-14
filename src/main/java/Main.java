@@ -2,8 +2,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.LongSummaryStatistics;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import com.google.common.collect.Streams;
 
@@ -19,13 +22,10 @@ public class Main {
         return str.getBytes(StandardCharsets.UTF_8);
     }
 
-    private static long getAvgTime(String plaintext, int epochs, Function<byte[], Long> algorithm) {
-        List<Long> times = new ArrayList<>();
-        for (int i = 0; i < epochs; i++) {
-            times.add(algorithm.apply(toBytes(plaintext)));
-        }
-        long sum = times.stream().reduce(0L, Long::sum);
-        return sum / times.size();
+    private static String getAvgTime(String plaintext, int epochs, Function<byte[], Long> algorithm) {
+        LongSummaryStatistics times = LongStream.range(0, epochs)
+                .map(i -> algorithm.apply(toBytes(plaintext))).summaryStatistics();
+        return String.format("%.4f", times.getAverage());
     }
 
     public static void main(String... args) {
@@ -34,7 +34,7 @@ public class Main {
             if (args.length == 2) {
                 numberOfEpochs = NumberUtils.toInt(args[1], numberOfEpochs);
             }
-            String str = "a";
+            String str = "Z";
             String key = "Esto es una prueba del algoritmo RC4";
             RC4 original = new RC4(toBytes(key));
 
@@ -45,20 +45,20 @@ public class Main {
             List<Integer> sizes = Arrays.asList(10, 20, 30, 40, 50, 60, 70, 80, 90, 100);
             final int epochs = numberOfEpochs;
             System.out.println("Epochs: " + epochs);
-            List<String> plaintexts = sizes.parallelStream().map(time -> StringUtils.repeat(str, time))
+            List<String> plaintexts = sizes.stream().map(time -> StringUtils.repeat(str, time))
                     .collect(Collectors.toList());
-            List<String> encryptionsRC4 = plaintexts.parallelStream()
+            List<String> encryptionsRC4 = plaintexts.stream()
                     .map(pt -> new String(original.encrypt(toBytes(pt)))).collect(Collectors.toList());
-            List<String> encryptionsModRC4 = plaintexts.parallelStream().map(pt -> new String(mod.encrypt(toBytes(pt))))
+            List<String> encryptionsModRC4 = plaintexts.stream().map(pt -> new String(mod.encrypt(toBytes(pt))))
                     .collect(Collectors.toList());
 
-            List<Long> timedEncryptionsRC4 = plaintexts.parallelStream()
+            List<String> timedEncryptionsRC4 = plaintexts.stream()
                     .map(pt -> getAvgTime(pt, epochs, original::timedEncryption)).collect(Collectors.toList());
-            List<Long> timedDecryptionsRC4 = encryptionsRC4.parallelStream()
+            List<String> timedDecryptionsRC4 = encryptionsRC4.stream()
                     .map(pt -> getAvgTime(pt, epochs, original::timedDecryption)).collect(Collectors.toList());
-            List<Long> timedEncryptionsModRC4 = plaintexts.parallelStream()
+            List<String> timedEncryptionsModRC4 = plaintexts.stream()
                     .map(pt -> getAvgTime(pt, epochs, mod::timedEncryption)).collect(Collectors.toList());
-            List<Long> timedDecryptionsModRC4 = encryptionsModRC4.parallelStream()
+            List<String> timedDecryptionsModRC4 = encryptionsModRC4.stream()
                     .map(pt -> getAvgTime(pt, epochs, mod::timedDecryption)).collect(Collectors.toList());
 
             System.out.println("Average times for RC4 Encryptions:");
